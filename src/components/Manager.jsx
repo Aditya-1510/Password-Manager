@@ -1,4 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { v4 as uuidv4 } from "uuid";
+
 function Manager() {
   const ref = useRef();
   const passwordref = useRef();
@@ -13,7 +17,17 @@ function Manager() {
   }, []);
 
   const copyText = (text) => {
-    alert("copied to clipboard " + text);
+    toast("text copied to clipboard", {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: "Bounce",
+    });
     navigator.clipboard.writeText(text);
   };
 
@@ -30,9 +44,25 @@ function Manager() {
 
   const savePassword = () => {
     console.log(form);
-    setpasswordArray([...passwordArray, form]);
-    localStorage.setItem("passwods", JSON.stringify([...passwordArray, form]));
+    setpasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
+    localStorage.setItem(
+      "passwods",
+      JSON.stringify([...passwordArray, { ...form, id: uuidv4() }])
+    );
     console.log(passwordArray);
+  };
+  const DeletePassword = (id) => {
+    console.log("Deleting password", id);
+    setpasswordArray(passwordArray.filter((items) => items.id !== id));
+    localStorage.setItem(
+      "passwods",
+      JSON.stringify(passwordArray.filter((items) => items.id !== id))
+    );
+    // console.log(passwordArray);
+  };
+
+  const editPassword = (id) => {
+    console.log("editing password", id);
   };
 
   const handleChange = (e) => {
@@ -41,6 +71,18 @@ function Manager() {
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        draggable
+        theme="light"
+        transition="Bounce"
+      />
+
       <div className="absolute inset-0 -z-10 h-full w-full bg-white [background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#6c9_100%)]"></div>
 
       <div className=" mycontainer">
@@ -104,7 +146,7 @@ function Manager() {
               src="https://cdn.lordicon.com/jgnvfzqg.json"
               trigger="hover"
             ></lord-icon>{" "}
-            Add Password
+            Save Password
           </button>
         </div>
         <div className="passwords">
@@ -117,6 +159,7 @@ function Manager() {
                   <th className="py-2">Site</th>
                   <th className="py-2">Username</th>
                   <th className="py-2">Password</th>
+                  <th className="py-2">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-green-100 rounded-xl overflow-hidden">
@@ -178,6 +221,36 @@ function Manager() {
                             ></lord-icon>
                           </div>
                         </div>
+                      </td>
+                      <td className=" flex justify-center py-2 border border-white text-center ">
+                        <span
+                          className="cursor-pointer mx-3"
+                          onClick={() => editPassword(item.id)}
+                        >
+                          <img
+                            style={{
+                              width: "25px",
+                              height: "25px",
+                              trigger: "hover",
+                            }}
+                            src="icons/edit.png"
+                            alt="abc"
+                          />
+                        </span>
+                        <span
+                          className="cursor-pointer mx-2"
+                          onClick={() => DeletePassword(item.id)}
+                        >
+                          <img
+                            style={{
+                              width: "25px",
+                              height: "25px",
+                              trigger: "hover",
+                            }}
+                            src="icons/delete.png"
+                            alt="abc"
+                          />
+                        </span>
                       </td>
                     </tr>
                   );
