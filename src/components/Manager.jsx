@@ -17,7 +17,7 @@ function Manager() {
   }, []);
 
   const copyText = (text) => {
-    toast("text copied to clipboard", {
+    toast("Text copied too clipboard", {
       position: "top-right",
       autoClose: 2000,
       hideProgressBar: false,
@@ -26,7 +26,6 @@ function Manager() {
       draggable: true,
       progress: undefined,
       theme: "light",
-      transition: "Bounce",
     });
     navigator.clipboard.writeText(text);
   };
@@ -43,26 +42,58 @@ function Manager() {
   };
 
   const savePassword = () => {
-    console.log(form);
-    setpasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
-    localStorage.setItem(
-      "passwods",
-      JSON.stringify([...passwordArray, { ...form, id: uuidv4() }])
-    );
-    console.log(passwordArray);
+    if (
+      form.site.length > 3 &&
+      form.userName.length > 3 &&
+      form.password.length > 3
+    ) {
+      setpasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
+      localStorage.setItem(
+        "passwods",
+        JSON.stringify([...passwordArray, { ...form, id: uuidv4() }])
+      );
+      setform({ site: "", userName: "", password: "" });
+      console.log(...passwordArray, form);
+      toast("password saved", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } else {
+      toast("Error:Password not saved");
+    }
   };
   const DeletePassword = (id) => {
-    console.log("Deleting password", id);
-    setpasswordArray(passwordArray.filter((items) => items.id !== id));
-    localStorage.setItem(
-      "passwods",
-      JSON.stringify(passwordArray.filter((items) => items.id !== id))
-    );
+    toast("Password Deleted", {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+    let c = confirm("Do you really want to delete the password ?");
+    if (c) {
+      setpasswordArray(passwordArray.filter((items) => items.id !== id));
+      localStorage.setItem(
+        "passwods",
+        JSON.stringify(passwordArray.filter((items) => items.id !== id))
+      );
+    }
     // console.log(passwordArray);
   };
 
   const editPassword = (id) => {
     console.log("editing password", id);
+    setform(passwordArray.filter((i) => i.id === id)[0]);
+    setpasswordArray(passwordArray.filter((items) => items.id !== id));
   };
 
   const handleChange = (e) => {
@@ -73,19 +104,20 @@ function Manager() {
     <>
       <ToastContainer
         position="top-right"
-        autoClose={1000}
+        autoClose={2000}
         hideProgressBar={false}
-        newestOnTop={false}
+        newestOnTop
         closeOnClick
         rtl={false}
+        pauseOnFocusLoss
         draggable
+        pauseOnHover
         theme="light"
-        transition="Bounce"
       />
 
-      <div className="absolute inset-0 -z-10 h-full w-full bg-white [background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#6c9_100%)]"></div>
+      <div className="absolute inset-0 -z-10 h-full w-full bg-white"></div>
 
-      <div className=" mycontainer">
+      <div className="p-3 md:container min-h-[85vh]">
         <h2 className="text-4xl text font-bold text-center">
           <span className="text-green-700"> &lt;</span>
           Pass
@@ -104,7 +136,7 @@ function Manager() {
             name="site"
             id=""
           />
-          <div className="flex w-full gap-8 justify-between">
+          <div className="flex flex-col md:flex-row p-4 w-full gap-8 justify-between">
             <input
               value={form.userName}
               onChange={handleChange}
@@ -149,11 +181,11 @@ function Manager() {
             Save Password
           </button>
         </div>
-        <div className="passwords">
+        <div className="passwords ">
           <h2 className="font-bold text-xl py-4">Your Passwords</h2>
           {passwordArray.length === 0 && <div>No passwords to show</div>}
           {passwordArray.length != 0 && (
-            <table className="table-auto w-full ">
+            <table className=" table-auto w-full rounded-md overflow-hidden mb-10">
               <thead className="bg-green-800 text-white">
                 <tr>
                   <th className="py-2">Site</th>
@@ -162,11 +194,11 @@ function Manager() {
                   <th className="py-2">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-green-100 rounded-xl overflow-hidden">
+              <tbody className="bg-green-100">
                 {passwordArray.map((item, index) => {
                   return (
                     <tr key={index}>
-                      <td className=" py-2 border border-white text-center min-w-32">
+                      <td className=" py-2 border border-white text-center">
                         <div className="flex items-center justify-center ">
                           <a href={item.site} target="_blank">
                             {item.site}
@@ -179,6 +211,8 @@ function Manager() {
                               style={{
                                 width: "25px",
                                 height: "25px",
+                                paddingTop: "3px",
+                                paddingLeft: "3px",
                               }}
                               src="https://cdn.lordicon.com/depeqmsz.json"
                               trigger="hover"
@@ -186,7 +220,7 @@ function Manager() {
                           </div>
                         </div>
                       </td>
-                      <td className=" py-2 border border-white text-center min-w-32">
+                      <td className=" py-2 border border-white text-center">
                         <div className="flex items-center justify-center ">
                           {item.userName}
                           <div
@@ -197,6 +231,8 @@ function Manager() {
                               style={{
                                 width: "25px",
                                 height: "25px",
+                                paddingTop: "3px",
+                                paddingLeft: "3px",
                               }}
                               src="https://cdn.lordicon.com/depeqmsz.json"
                               trigger="hover"
@@ -222,7 +258,7 @@ function Manager() {
                           </div>
                         </div>
                       </td>
-                      <td className=" flex justify-center py-2 border border-white text-center ">
+                      <td className="  py-2 border border-white text-center  flex justify-center">
                         <span
                           className="cursor-pointer mx-3"
                           onClick={() => editPassword(item.id)}
@@ -238,7 +274,7 @@ function Manager() {
                           />
                         </span>
                         <span
-                          className="cursor-pointer mx-2"
+                          className="cursor-pointer mx-3"
                           onClick={() => DeletePassword(item.id)}
                         >
                           <img
@@ -246,6 +282,8 @@ function Manager() {
                               width: "25px",
                               height: "25px",
                               trigger: "hover",
+                              display: "flex",
+                              justifyContent: "center",
                             }}
                             src="icons/delete.png"
                             alt="abc"
